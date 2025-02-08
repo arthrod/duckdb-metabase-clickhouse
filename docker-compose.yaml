@@ -15,7 +15,7 @@ services:
     ports:
       - "${MB_PORT:-6120}:3000"
     environment:
-      # Points Metabase to the plugins directory (must match Dockerfile and volume mount)
+      # Points Metabase to the plugins directory
       MB_PLUGINS_DIR: /plugins
       # Configure Metabase to use DuckDB as the embedded application database
       MB_DB_TYPE: duckdb
@@ -24,6 +24,11 @@ services:
       MB_DB_FILE: /metabase-data/duckdb_database.duckdb
       # Do not load sample content on startup
       MB_LOAD_SAMPLE_CONTENT: "false"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   clickhouse:
     container_name: clickhouse
@@ -34,4 +39,4 @@ services:
       nofile:
         soft: 262144
         hard: 262144
-    # No port mappings here; ClickHouse will be accessible only within the Docker network.
+    # No port mappings here; ClickHouse remains accessible only within the Docker network.
